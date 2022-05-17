@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Information Propagation Speed</title>
+        <meta charset="utf-8">
+            <!-- Fit exactly to page, no zooming -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+            <!-- Packed scripts -->
+        <script defer src="https://d3js.org/d3.v5.min.js"></script>
+        <!-- My scripts -->
+        <script defer src="./timer.js"></script>
+        <script defer src="./network.js"></script>
+        <script defer src="./simulation.js"></script>
+        <script defer src="./controls.js"></script>
+        <script defer src="./main.js"></script>
+        <!-- Page layout and rendering styles -->
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    </head>
+    <body>
+        <!-- Network connectivity graph -->
+        <div class="label-container network-label">
+            <p class="label-title">P2P Network</p>
+        </div>
+        <svg class="network">
+            <defs>
+                <marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="6.5" refY="1.75" orient="auto">
+                    <polygon points="0 0, 5 1.75, 0 3.5" fill="#ddd"/>
+                </marker>
+            </defs>
+        </svg>
+        <!-- Simulation controls panel -->
+        <div id="playback-buttons">
+            <span id="restart" class="icon material-icons">restart_alt</span>
+            <span id="play-pause" class="icon material-icons">pause</span>
+        </div>
+        <div class="controls">
+            <div class="subgrid">
+                <label for="timing" class="input-name">Simulation Speed</label>
+                <input type="range" min="0.5" max="5" value="2" step=any id="timing">
+                <label for="timing" class="input-val" id="timing-text"></label>
+            </div>
+
+            <div class="subgrid" id="network-select"></div>
+            <div class="subgrid" id="simulation-select"></div>
+
+        </div>
+    </body>
+</html>

@@ -1,0 +1,197 @@
+:root {
+    --off-white: #ddd;
+    --light-gray: rgb(177, 177, 177);
+    --off-black: #222;
+}
+body {
+    margin: 0;
+    padding: 5px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+
+    background: var(--off-black);
+
+    display: flex;
+    flex-direction: column;
+}
+body > svg {
+    width: 100%;
+    height: 100%;
+}
+.label-container {
+    padding: 5px;
+    margin: 0 auto auto auto;
+    z-index: 3;
+}
+.label-container p {
+    margin: 0;
+    font-size: 16px;
+}
+.label-container .label-title {
+    font-weight: bold;
+}
+.label-container .selected-peer {
+    background-color: rgb(50, 130, 225);
+    padding: 1px 1ch;
+    border-radius: 2em;
+}
+.controls {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: repeat(auto-fill, 20px);
+    grid-gap: 8px;
+    align-items: center;
+    align-self: center;
+    width: min(600px, 95%);
+    margin: 8px 0;
+}
+.controls label,
+.label-container p {
+    color: var(--off-white);
+    font-family: Roboto, sans-serif;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    white-space: nowrap;
+}
+.controls .input-name {
+    margin-right: 5px;
+}
+.controls input {
+    cursor: pointer;
+}
+.controls select {
+    color: var(--off-white);
+    background-color: var(--off-black);
+    border: 2px solid var(--off-white);
+    border-radius: 4px;
+    font-family: Roboto, sans-serif;
+    padding: 2px;
+    font-size: 0.9em;
+}
+.subgrid {
+    display: contents;
+}
+#playback-buttons {
+    display: flex;
+    justify-content: center;
+}
+#playback-buttons .icon {
+    color: var(--off-white);
+    font-size: 2em;
+    text-align: center;
+    cursor: pointer;
+    margin: 0 10px;
+}
+svg {
+    z-index: 2;
+    pointer-events: none;
+    flex-grow: 1;
+}
+svg.network .nodes .node-group {
+    pointer-events: painted;
+}
+
+/* Network SVG Styling*/
+svg.network .links > g.self {
+    display: none;
+}
+svg.network .links > g > line:last-child {
+    marker-end: url(#arrowhead);
+}
+svg.network .nodes > g > circle {
+    --edit-blip-color: #36322c;
+    cursor: pointer;
+
+    animation-timing-function: cubic-bezier(.22,.61,.36,1);
+    animation-duration: 2s;
+    
+}
+svg.network .nodes g.selected > circle {
+    stroke: rgb(50, 130, 225);
+}
+.edit-blip-1 {animation-name: edit-blip-1;}
+.edit-blip-2 {animation-name: edit-blip-2;}
+@keyframes edit-blip-1 {
+    from { fill: var(--edit-blip-color); }
+    to   { fill: var(--fill-color);      }
+}
+@keyframes edit-blip-2 {
+    from { fill: var(--edit-blip-color); }
+    to   { fill: var(--fill-color);      }
+}
+g.selected .node-label-background {
+    fill: rgb(50, 130, 225);
+    opacity: 1;
+}
+.node-label-background {
+    fill: var(--off-black);
+    opacity: 0.5;
+    transition: 0.1s fill ease-out,
+                0.1s opacity ease-out;
+}
+.node-label {
+    font-family: Roboto, sans-serif;
+    fill: white;
+    font-size: 10pt;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+svg.network .fissure,
+svg.network .fissure * {
+    cursor: default;
+}
+svg.network .fissure text.fissure-sign {
+    font-weight: bold;
+    font-family: sans-serif;
+    text-anchor: middle;
+    fill: white;
+    font-size: 14px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.fissures {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+}
+.fissures .dag-select {
+    width: calc(var(--fissure-select-width) + 20px);
+    flex: 1;
+    transform: translateX(20px);
+    transition: 0.08s transform ease-out;
+    --fissure-select-width: 40px;
+    display: flex;
+    align-items: center;
+}
+.fissures .dag-select.selected {
+    transform: translateX(0px);
+}
+.dag-select::after {
+    font-weight: bold;
+    font-family: Roboto, sans-serif;
+    color: var(--off-white);
+    width: var(--fissure-select-width);
+    text-align: center;
+    text-shadow: 0px 0px 5px black;
+}
+.dag-select.dag-plus::after {
+    content: '+';
+}
+.dag-select.dag-minus::after {
+    content: '\2212';
+}
