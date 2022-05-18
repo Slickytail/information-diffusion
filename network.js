@@ -41,7 +41,7 @@ class RandomNetwork {
         // what distribution to use for number of peers,
         // what distribution to use for Kxy, etc
 
-        this.nodes = Array(n).fill(null).map((e, i) => {
+        this.nodes = Array(n).fill(null).map((_, i) => {
             return {id: i}
         });
         this.matrix = Array(n).fill(null);

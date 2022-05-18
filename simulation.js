@@ -47,7 +47,7 @@ class Simulation {
 
     _tick() {}
     _init() {}
-    _click(node) {}
+    _click(_) {}
 
     tick() {
         this._tick();
@@ -139,7 +139,6 @@ class LocalStochasticInformationSimulation extends Simulation {
         const information_old = this.nodes.map(n => n.information);
         this.nodes.forEach((n, i) => {
             let ret = n.information;
-            let fill = 0;
             switch (n.information) {
                 case 0: // Not seen, not posted
                 case 1: // Seen, not posted
