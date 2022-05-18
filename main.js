@@ -259,17 +259,17 @@ var physics = d3.forceSimulation()
                         .id(d => d.id)
                         .distance(20)
                         // Higher weight edges should keep their nodes closer
-                        .strength(d => d.weight / 2))
+                        .strength(d => d.weight / 3))
     .force("repel", d3.forceManyBody()
                         .strength(-500)
-                        .distanceMax(150))
+                        .distanceMax(180))
     .force("center", d3.forceCenter(0, 0));
 
 function updateLinks() {
     physics.nodes(network.nodes)
            .force("link")
            .links(network.edges);
-    physics.alpha(0.2).restart();
+    physics.alpha(0.3).restart();
     requestAnimationFrame(update_graphics);
 }
 
@@ -282,7 +282,7 @@ var link = svg.append("g")
             .selectAll("g");
 
 timer.start();
-physics.alpha(0.2).restart()
+physics.alpha(0.3).restart()
 const clampSym = (x, l) => Math.min(Math.max(-l, x), l);
 physics.on("tick", () => {
     // Move the nodes and lines
@@ -304,7 +304,7 @@ physics.on("tick", () => {
 
 function dragstarted(d) {
     if (!d3.event.active)
-        physics.alphaTarget(0.1).restart();
+        physics.alphaTarget(0.2).restart();
     d.fx = d.x;
     d.fy = d.y;
     //hoverOn(d);
