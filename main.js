@@ -1,23 +1,26 @@
 // ---- Compute the size of SVG elements ----
-const body = document.getElementsByTagName('body')[0];
-var computedStyle = getComputedStyle(body);
 
-const bh = body.clientHeight
-    - parseFloat(computedStyle.paddingTop)
-    - parseFloat(computedStyle.paddingBottom);
-const bw = body.clientWidth
-    - parseFloat(computedStyle.paddingLeft)
-    - parseFloat(computedStyle.paddingRight);
+var svg, svg_w, svg_h;
+function setViewbox() {
+    svg = d3.select("svg.network");
 
-const ratio = document.documentElement.clientWidth
-                / document.documentElement.clientHeight;
-const elw = Math.min((ratio > 1) ? bw/2 : bw, 400);
-const elh = Math.min((ratio > 1) ? bh : bh/2, 400);
+    const bbox = svg.node().getBoundingClientRect();
+    const ratio = bbox.width / bbox.height;
+    svg_w = (ratio > 1) ? ratio * 400 : 400;
+    svg_h = (ratio > 1) ? 400 : 400 / ratio;
 
-d3.select("svg.dag").attr("viewBox", `-40 -50 ${elw+80} ${elh+100}`);
-const svg = d3.select("svg.network")
-                .attr("viewBox", `-20 -20 ${elw+40} ${elh+40}`);
-const sim_scale = Math.min(1, Math.min(elw, elh)/400);
+    svg.attr("viewBox", `${-svg_w/2} ${-svg_h/2} ${svg_w} ${svg_h}`);
+
+    // Make sure nodes don't clip.
+    // Run a few ticks at very low heat to clamp
+    if (physics)
+        physics
+            .alpha(Math.max(0.02, physics.alpha()))
+            .restart();
+}
+// Since we set `defer` on this script, the svg element will already exist when we call this
+setViewbox();
+window.addEventListener("resize", setViewbox);
 
 // ---- Actually initialize the simulation ----
 // TODO: Find a cleaner way of doing this initialization
@@ -65,13 +68,18 @@ const nselect = document.getElementById("network-select");
 controls(nselect, "Graph", NETWORKS, (n, opts) => {
     // When network changed
     network = new n(opts);
-
-    setTimeout(() => updateLinks());
     loadSimulation(simulation.constructor, simulation.opts);
-});
+    // The initial call to controls() will call the callback with the default selection
+    // At this point, the physics sim might not be defined.
+    if (physics)
+        updateLinks();
+    // In that case, we'll queue the update instead.
+    else
+        setTimeout(updateLinks);
+}, setViewbox);
 
 const sselect = document.getElementById("simulation-select");
-controls(sselect, "Model", SIMULATIONS, loadSimulation);
+controls(sselect, "Model", SIMULATIONS, loadSimulation, setViewbox);
 
 /*
 // Make a node flash... 
@@ -245,25 +253,24 @@ function update_fissures() {
 }
 */
 // Initialize the force simulation
-const physics = d3.forceSimulation()
+var physics = d3.forceSimulation()
     .nodes(network.nodes)
     .force("link", d3.forceLink(network.edges)
                         .id(d => d.id)
                         .distance(20)
                         // Higher weight edges should keep their nodes closer
-                        .strength(d => sim_scale * d.weight / 2))
+                        .strength(d => d.weight / 2))
     .force("repel", d3.forceManyBody()
-                        .strength(-500 * sim_scale)
-                        .distanceMax(300 * sim_scale))
-    .force("center", d3.forceCenter(elw/2, elh/2));
+                        .strength(-500)
+                        .distanceMax(150))
+    .force("center", d3.forceCenter(0, 0));
 
-// Potentially can DRY here...
 function updateLinks() {
     physics.nodes(network.nodes)
            .force("link")
            .links(network.edges);
-    update_graphics();
     physics.alpha(0.2).restart();
+    requestAnimationFrame(update_graphics);
 }
 
 var link = svg.append("g")
@@ -276,12 +283,13 @@ var link = svg.append("g")
 
 timer.start();
 physics.alpha(0.2).restart()
+const clampSym = (x, l) => Math.min(Math.max(-l, x), l);
 physics.on("tick", () => {
     // Move the nodes and lines
     network.nodes.forEach(d => {
-        d.x = Math.min(Math.max(15, d.x), elw-15);
-        d.y = Math.min(Math.max(15, d.y), elh-15);
-    })
+        d.x = clampSym(d.x, svg_w/2 - 15);
+        d.y = clampSym(d.y, svg_h/2 - 15);
+    });
     link.selectAll("line")
         // Duplicate the data from the group to the two individual lines
         .data(d => [d, d])
@@ -295,7 +303,8 @@ physics.on("tick", () => {
 });
 
 function dragstarted(d) {
-    if (!d3.event.active) physics.alphaTarget(0.2).restart();
+    if (!d3.event.active)
+        physics.alphaTarget(0.1).restart();
     d.fx = d.x;
     d.fy = d.y;
     //hoverOn(d);

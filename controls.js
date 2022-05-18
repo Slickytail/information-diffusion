@@ -3,7 +3,7 @@
 // options: an array of classes with certain static fields (see network.js for details)
 // cb: function(class, opts)
 
-function controls(el, name, options, cb) {
+function controls(el, name, options, option_cb, layout_cb) {
     let container = d3.select(el);
     let topselect = container
         .append("div")
@@ -27,8 +27,8 @@ function controls(el, name, options, cb) {
         .remove();
     entries.enter()
         .append("option")
-        .attr("selected", (d, i) => i === 0 ? true : null)
-        .attr("value", (d, i) => i)
+        .attr("selected", (_, i) => i === 0 ? true : null)
+        .attr("value", (_, i) => i)
         .text(d => d.name)
         .merge(entries);
 
@@ -73,7 +73,7 @@ function controls(el, name, options, cb) {
 
                 // Actually update the parameter...
                 cur_opts[data.arg] = parseFloat(this.value);
-                cb(c, cur_opts);
+                option_cb(c, cur_opts);
             });
 
         // Store current value of the options
@@ -81,7 +81,9 @@ function controls(el, name, options, cb) {
         // Initialize each option to the default value
         params.forEach(p => cur_opts[p.arg] = p.val);
         // callback with the selected class and the default options
-        cb(c, cur_opts);
+        option_cb(c, cur_opts);
+        if (layout_cb)
+            layout_cb();
 
     }
     toplevelchange(options[0]);
