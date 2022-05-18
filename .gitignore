@@ -1,0 +1,7 @@
+jsconfig.json
+tsconfig.json
+
+.pycharm
+.idea/
+.vscode/
+.history/
