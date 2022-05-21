@@ -321,10 +321,11 @@ function dragended(d) {
     d.fy = null;
 }
 
-function clicked(e, d) {
-    // Dragged
-    if (e.defaultPrevented) return;
+function clicked(d) {
+    // Cancel if dragged
+    if (d3.event.defaultPrevented) return;
     simulation.click(d);
+    d3.event.stopPropagation();
 }
 /*
 function hoverOn(d) {

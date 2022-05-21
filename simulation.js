@@ -60,7 +60,7 @@ class Simulation {
             this._onchange();
     }
     click(node) {
-        this._click(this.nodes[node]);
+        this._click(node);
         if (this._onchange)
             this._onchange();
     }
