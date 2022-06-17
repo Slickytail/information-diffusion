@@ -125,7 +125,7 @@ class LocalStochasticInformationSimulation extends Simulation {
 
     constructor(network, opts) {
         super(network, opts);
-        this.FILLS = ["#ddd", "#9cd", "#2bd", "#2bd"];
+        this.FILLS = ["#122", "#456", "#1af", "#1af"];
         this.STROKES = ["#689", "#689", "#689", "#bd2"];
         this.edges.forEach((e) => {
             e.width = 8 * e.weight + 1;
@@ -185,4 +185,106 @@ class LocalStochasticInformationSimulation extends Simulation {
     }
 }
 
-const SIMULATIONS = [LinearDeterministicDiffusionSimulation, LocalStochasticInformationSimulation];
+class NeighborhoodStochasticInformationSimulation extends Simulation {
+
+    static name = "Stochastic Neighborhood Information";
+    static params = [
+        {
+            arg: "r",
+            text: "Neighborhood Radius",
+            val: 1,
+            min: 1,
+            max: 4,
+            step: 1
+        },
+        {
+            arg: "l",
+            text: "Neighborhood Boost",
+            val: 0.1,
+            min: 0,
+            max: 1
+        }
+    ];
+
+    constructor(network, opts) {
+        super(network, opts);
+
+        this.FILLS = ["#122", "#456", "#1af", "#1af"];
+        this.STROKES = ["#689", "#689", "#689", "#bd2"];
+        // Compute the neighborhood of radius r for each node
+        this.neighborhoods = this.nodes.map((_, n) => {
+            let visited = new Set();
+            let explore = (t, depth) => {
+                if (visited.has(t))
+                    return;
+                visited.add(t);
+                if (depth) 
+                    Object.keys(this.matrix[t]).forEach(l => explore(l, depth - 1));
+            }
+            explore(n, opts.r);
+            return Array.from(visited);
+        });
+        this.edges.forEach((e) => {
+            e.width = 8 * e.weight + 1;
+            e.strokewidth = 2;
+        });
+        this._init();
+    }
+
+    _tick() {
+        // Freeze the before-tick copy of each node
+        const information_old = this.nodes.map(n => n.information);
+        this.nodes.forEach((n, i) => {
+            let ret = n.information;
+            switch (n.information) {
+                case 0: // Not seen, not posted
+                case 1: // Seen, not posted
+                    const seen_influence = Object.entries(this.matrix[i])
+                        .map(([y, kxy]) => (information_old[y] == 3 ? kxy : 0))
+                        .reduce((a, b) => a+b);
+                    if (seen_influence) {
+                        const neighborhood_n_posted = this.neighborhoods[i]
+                            .map(y => information_old[y] > 1)
+                            .reduce((a, b) => a+b);
+                        const neighborhood_influence = 1 - 1/(1 + this.opts.l * neighborhood_n_posted);
+                        ret = (Math.random() < (seen_influence + neighborhood_influence)) ? 3 : 1;
+                    }
+                    break;
+                case 2: // Seen, posted
+                case 3: // Actively posting
+                    ret = 2;
+                    break;
+                    
+            }
+            n.information = ret;
+            this.setStyles(n);
+        });
+        
+    }
+    _init() {
+        // No one has seen the information
+        this.nodes.forEach((n) => {
+            n.information = 0;
+            this.setStyles(n);
+        });
+
+    }
+    _click(n) {
+        n.information = 3;
+        this.setStyles(n);
+    }
+
+    cleanup() {
+        super.cleanup();
+        this.nodes.forEach(n => delete n.information);
+    }
+
+    setStyles(node, state) {
+        if (state === undefined)
+            state = node.information;
+        node.fill = this.FILLS[state];
+        node.stroke = this.STROKES[state];
+    }
+}
+
+const SIMULATIONS = [LinearDeterministicDiffusionSimulation, LocalStochasticInformationSimulation, NeighborhoodStochasticInformationSimulation];

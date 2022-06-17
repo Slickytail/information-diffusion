@@ -317,8 +317,10 @@ function dragged(d) {
 
 function dragended(d) {
     if (!d3.event.active) physics.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
+    if (!d.fixed) {
+        d.fx = null;
+        d.fy = null;
+    }
 }
 
 function clicked(d) {

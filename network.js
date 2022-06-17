@@ -127,28 +127,34 @@ class CartesianNetwork {
                     row: y,
                     col: x,
                     fx: spacing * (x - w/2 + 1/2),
-                    fy: spacing * (y - h/2 + 1/2)
+                    fy: spacing * (y - h/2 + 1/2),
+                    fixed: true
                 };
                 
                 const neighbors = ( (x == 0 || x == w - 1) ? 1 : 2) +
                                   ( (y == 0 || y == h - 1) ? 1 : 2);
                 this.matrix[id] = {};
-                for (let xi = Math.max(x - 1, 0); xi <= Math.min(x + 1,  w - 1); xi++) {
-                    for (let yi = Math.max(y - 1, 0); yi <= Math.min(y + 1,  h - 1); yi++) {
-                        const w = (xi == x && yi == y) ? b : (1 - b) / neighbors;
-                        const target = xi * h + yi;
-                        this.matrix[id][target] = w;
-                        this.edges.push({
-                            source: id,
-                            target: target,
-                            id: `${id}-${target}`,
-                            weight: w,
-                            self: xi == x && yi == y
-                        });
-
-                    }
-
+                let add_edge = (xi, yi) => {
+                    const w = (xi == x && yi == y) ? b : (1 - b) / neighbors;
+                    const target = xi * h + yi;
+                    this.matrix[id][target] = w;
+                    this.edges.push({
+                        source: id,
+                        target: target,
+                        id: `${id}-${target}`,
+                        weight: w,
+                        self: xi == x && yi == y
+                    });
                 }
+                add_edge(x, y)
+                if (x != 0)
+                    add_edge(x-1, y)
+                if (y != 0)
+                    add_edge(x, y-1)
+                if (x != w - 1)
+                    add_edge(x+1, y)
+                if (y != h - 1)
+                    add_edge(x, y+1)
             }
         }
     }
