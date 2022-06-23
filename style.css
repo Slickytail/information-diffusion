@@ -13,7 +13,7 @@ body {
     right: 0;
     overflow: hidden;
 
-    background: var(--off-black);
+    /*background: var(--off-black); */
 
     display: flex;
     flex-direction: column;
@@ -51,7 +51,6 @@ body > svg {
 }
 .controls label,
 .label-container p {
-    color: var(--off-white);
     font-family: Roboto, sans-serif;
     
     -webkit-user-select: none;
@@ -66,8 +65,6 @@ body > svg {
     cursor: pointer;
 }
 .controls select {
-    color: var(--off-white);
-    background-color: var(--off-black);
     border: 2px solid var(--off-white);
     border-radius: 4px;
     font-family: Roboto, sans-serif;
@@ -82,7 +79,6 @@ body > svg {
     justify-content: center;
 }
 #playback-buttons .icon {
-    color: var(--off-white);
     font-size: 2em;
     text-align: center;
     cursor: pointer;
@@ -184,7 +180,6 @@ svg.network .fissure text.fissure-sign {
 .dag-select::after {
     font-weight: bold;
     font-family: Roboto, sans-serif;
-    color: var(--off-white);
     width: var(--fissure-select-width);
     text-align: center;
     text-shadow: 0px 0px 5px black;

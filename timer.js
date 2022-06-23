@@ -26,6 +26,7 @@ class Timer {
 
     _queue_tick() {
         if (!this.isPaused) {
+            clearTimeout(this.timeout);
             this.timeout = setTimeout(() => {
                 if (this._ontick)
                     this._ontick();

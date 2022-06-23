@@ -100,15 +100,15 @@ function flash_node(uid) {
 const dsn = {
     radius: 10,
     fill: "#c8dcf0",
-    stroke: "#786e60",
-    strokewidth: 3,
+    stroke: "black",
+    strokewidth: 2,
     text: ""
 };
 const dse = {
     width: 6,
-    fill: "#ddd",
-    stroke: "rgba(30, 30, 30, 0.5)",
-    strokewidth: 2
+    fill: "#444",
+    stroke: "rgba(0, 0, 0, 0.1)",
+    strokewidth: 1
 };
 // Update the styling of the nodes and edges
 function update_graphics() {
@@ -281,7 +281,6 @@ var link = svg.append("g")
                 .classed("nodes", true)
             .selectAll("g");
 
-timer.start();
 physics.alpha(0.3).restart()
 const clampSym = (x, l) => Math.min(Math.max(-l, x), l);
 physics.on("tick", () => {
